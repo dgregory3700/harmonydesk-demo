@@ -2,14 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-
-type Client = {
-  id: string;
-  name: string;
-  email: string | null;
-  phone: string | null;
-  notes: string | null;
-};
+import { demoDataClient } from "@/lib/demo/client";
+import { DemoDisable } from "@/components/demo/DemoDisable";
+import type { Client } from "@/lib/demo/data/clients";
 
 export default function ClientsPage() {
   const [clients, setClients] = useState<Client[]>([]);
@@ -23,12 +18,7 @@ export default function ClientsPage() {
         setLoading(true);
         setError(null);
 
-        const res = await fetch("/api/clients");
-        if (!res.ok) {
-          throw new Error("Failed to load clients");
-        }
-
-        const data = (await res.json()) as Client[];
+        const data = await demoDataClient.getClients();
         setClients(data);
       } catch (err: any) {
         console.error("Error loading clients:", err);
@@ -69,12 +59,14 @@ export default function ClientsPage() {
           </p>
         </div>
 
-        <Link
-          href="/clients/new"
-          className="rounded-md bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-500 transition-colors"
-        >
-          + New client
-        </Link>
+        <DemoDisable>
+          <Link
+            href="/clients/new"
+            className="rounded-md bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-500 transition-colors"
+          >
+            + New client
+          </Link>
+        </DemoDisable>
       </div>
 
       {/* Filters + search */}
@@ -132,12 +124,14 @@ export default function ClientsPage() {
                   >
                     View client
                   </Link>
-                  <Link
-                    href={`/cases/new`}
-                    className="rounded-md border border-slate-700 bg-transparent px-3 py-1 font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition-colors"
-                  >
-                    Add case
-                  </Link>
+                  <DemoDisable>
+                    <Link
+                      href={`/cases/new`}
+                      className="rounded-md border border-slate-700 bg-transparent px-3 py-1 font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition-colors"
+                    >
+                      Add case
+                    </Link>
+                  </DemoDisable>
                 </div>
               </div>
             ))}

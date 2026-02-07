@@ -3,30 +3,9 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-
-// --- TYPES ---
-type CaseStatus = "Open" | "Upcoming" | "Closed";
-
-type MediationCase = {
-  id: string;
-  caseNumber: string;
-  matter: string;
-  parties: string;
-  county: string;
-  status: CaseStatus;
-  nextSessionDate: string | null;
-  notes: string | null;
-};
-
-type MediationSession = {
-  id: string;
-  userEmail: string;
-  caseId: string;
-  date: string;
-  durationHours: number;
-  notes: string | null;
-  completed: boolean;
-};
+import { demoDataClient } from "@/lib/demo/client";
+import type { MediationCase } from "@/lib/demo/data/cases";
+import type { MediationSession } from "@/lib/demo/data/sessions";
 
 // --- HELPERS ---
 function formatDateTime(value?: string | null) {
@@ -78,24 +57,13 @@ export default function CalendarPage() {
         setLoading(true);
         setError(null);
 
-        const [sessionsRes, casesRes] = await Promise.all([
-          fetch("/api/sessions"),
-          fetch("/api/cases"),
+        const [sessionsData, casesData] = await Promise.all([
+          demoDataClient.getSessions(),
+          demoDataClient.getCases(),
         ]);
 
-        if (!sessionsRes.ok) {
-          throw new Error("Failed to load sessions");
-        }
-        if (!casesRes.ok) {
-          throw new Error("Failed to load cases");
-        }
-
-        const sessionsJson =
-          (await sessionsRes.json()) as MediationSession[];
-        const casesJson = (await casesRes.json()) as MediationCase[];
-
-        setSessions(sessionsJson);
-        setCases(casesJson);
+        setSessions(sessionsData);
+        setCases(casesData);
       } catch (err: any) {
         console.error("Error loading calendar data:", err);
         setError(err?.message ?? "Failed to load calendar data");

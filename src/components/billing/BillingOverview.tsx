@@ -2,6 +2,9 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import { jsPDF } from "jspdf";
+import { DemoDisable } from "@/components/demo/DemoDisable";
+import { demoDataClient } from "@/lib/demo/client";
+import type { Invoice as InvoiceData } from "@/lib/demo/data/invoices";
 
 type InvoiceStatus = "Draft" | "Sent" | "For county report";
 
@@ -16,40 +19,33 @@ type Invoice = {
   due: string;
 };
 
-type NewInvoiceForm = {
-  caseNumber: string;
-  matter: string;
-  contact: string;
-  hours: string;
-  rate: string;
-};
-
 export default function BillingOverview() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [formOpen, setFormOpen] = useState(false);
-  const [newInvoice, setNewInvoice] = useState<NewInvoiceForm>({
-    caseNumber: "",
-    matter: "",
-    contact: "",
-    hours: "",
-    rate: "",
-  });
 
-  // Load invoices from API (Supabase-backed)
+  // Load demo invoices and convert to billing format
   useEffect(() => {
     async function loadInvoices() {
       try {
         setLoading(true);
         setError(null);
-        const res = await fetch("/api/invoices", { method: "GET" });
-        if (!res.ok) {
-          const body = await res.json().catch(() => ({}));
-          throw new Error(body.error || "Failed to load invoices");
-        }
-        const data = (await res.json()) as Invoice[];
-        setInvoices(data);
+        const data = await demoDataClient.getInvoices();
+        
+        // Convert to billing format
+        const converted = data.map((inv): Invoice => ({
+          id: inv.id,
+          caseNumber: inv.caseName?.split(' ')[0] || "CASE-001",
+          matter: inv.caseName || inv.clientName,
+          contact: inv.clientName,
+          hours: inv.amount / 250, // Assuming $250/hr
+          rate: 250,
+          status: inv.status === "Draft" ? "Draft" : inv.status === "Paid" ? "Sent" : "Sent",
+          due: inv.dueDate,
+        }));
+        
+        setInvoices(converted);
       } catch (err: any) {
         console.error(err);
         setError(err.message || "Failed to load invoices");
@@ -86,125 +82,7 @@ export default function BillingOverview() {
     [countyInvoices]
   );
 
-  function handleFormChange(field: keyof NewInvoiceForm, value: string) {
-    setNewInvoice((prev) => ({ ...prev, [field]: value }));
-  }
-
-  async function handleAddInvoice(e: React.FormEvent) {
-    e.preventDefault();
-
-    try {
-      const hours = parseFloat(newInvoice.hours || "0");
-      const rate = parseFloat(newInvoice.rate || "0");
-
-      const body = {
-        caseNumber: newInvoice.caseNumber.trim(),
-        matter: newInvoice.matter.trim(),
-        contact: newInvoice.contact.trim(),
-        hours: Number.isNaN(hours) ? 0 : hours,
-        rate: Number.isNaN(rate) ? 0 : rate,
-      };
-
-      const res = await fetch("/api/invoices", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || "Failed to create invoice");
-      }
-
-      const created = (await res.json()) as Invoice;
-      setInvoices((prev) => [created, ...prev]);
-
-      setNewInvoice({
-        caseNumber: "",
-        matter: "",
-        contact: "",
-        hours: "",
-        rate: "",
-      });
-      setFormOpen(false);
-    } catch (err: any) {
-      console.error(err);
-      alert(err.message || "Could not create invoice");
-    }
-  }
-
-  async function handleStatusChange(id: string, status: InvoiceStatus) {
-    try {
-      const res = await fetch(`/api/invoices/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status }),
-      });
-
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || "Failed to update invoice");
-      }
-
-      const updated = (await res.json()) as Invoice;
-      setInvoices((prev) =>
-        prev.map((inv) => (inv.id === id ? updated : inv))
-      );
-    } catch (err: any) {
-      console.error(err);
-      alert(err.message || "Could not update invoice");
-    }
-  }
-
-  // 🗑 delete invoice
-  async function handleDeleteInvoice(id: string) {
-    const confirmed = window.confirm(
-      "Delete this invoice? This action cannot be undone."
-    );
-    if (!confirmed) return;
-
-    try {
-      const res = await fetch(`/api/invoices/${id}`, {
-        method: "DELETE",
-      });
-
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || "Failed to delete invoice");
-      }
-
-      setInvoices((prev) => prev.filter((inv) => inv.id !== id));
-    } catch (err: any) {
-      console.error(err);
-      alert(err.message || "Could not delete invoice");
-    }
-  }
-
-  // ✅ prepare & send with double-check
-  async function handlePrepareAndSend(inv: Invoice) {
-    const total = inv.hours * inv.rate;
-
-    const ok = window.confirm(
-      [
-        "Please double-check this invoice before sending:",
-        "",
-        `Case: ${inv.caseNumber}`,
-        `Matter: ${inv.matter}`,
-        `Bill to: ${inv.contact}`,
-        `Hours: ${inv.hours.toFixed(2)}`,
-        `Rate: $${inv.rate.toFixed(2)}`,
-        `Total: $${total.toFixed(2)}`,
-        "",
-        "If everything looks correct, click OK to mark this invoice as Sent.",
-      ].join("\n")
-    );
-
-    if (!ok) return;
-
-    await handleStatusChange(inv.id, "Sent");
-  }
-
-  // Simple preview for Sent / county-report invoices
+  // Simple preview for invoices (read-only demo)
   function handleViewInvoice(inv: Invoice) {
     const total = inv.hours * inv.rate;
     alert(
@@ -218,7 +96,7 @@ export default function BillingOverview() {
         `Rate: $${inv.rate.toFixed(2)}`,
         `Total: $${total.toFixed(2)}`,
         "",
-        "In a future version this will open a full printable invoice.",
+        "Demo mode — read-only",
       ].join("\n")
     );
   }
@@ -363,101 +241,15 @@ export default function BillingOverview() {
       <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-4 shadow-sm">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-medium text-slate-200">New invoice</h2>
-          <button
-            type="button"
-            className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-1 text-xs font-medium text-slate-200 hover:bg-slate-700 transition-colors"
-            onClick={() => setFormOpen((v) => !v)}
-          >
-            {formOpen ? "Close form" : "New invoice"}
-          </button>
+          <DemoDisable>
+            <button
+              type="button"
+              className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-1 text-xs font-medium text-slate-200 hover:bg-slate-700 transition-colors"
+            >
+              New invoice
+            </button>
+          </DemoDisable>
         </div>
-
-        {formOpen && (
-          <form
-            onSubmit={handleAddInvoice}
-            className="mt-4 grid gap-3 md:grid-cols-5"
-          >
-            <div className="md:col-span-1">
-              <label className="mb-1 block text-xs font-medium text-slate-400">
-                Case number
-              </label>
-              <input
-                className="w-full rounded-md border border-slate-700 bg-slate-950 text-slate-200 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 placeholder-slate-600"
-                value={newInvoice.caseNumber}
-                onChange={(e) =>
-                  handleFormChange("caseNumber", e.target.value)
-                }
-                required
-              />
-            </div>
-            <div className="md:col-span-2">
-              <label className="mb-1 block text-xs font-medium text-slate-400">
-                Matter
-              </label>
-              <input
-                className="w-full rounded-md border border-slate-700 bg-slate-950 text-slate-200 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
-                value={newInvoice.matter}
-                onChange={(e) =>
-                  handleFormChange("matter", e.target.value)
-                }
-                required
-              />
-            </div>
-            <div className="md:col-span-2">
-              <label className="mb-1 block text-xs font-medium text-slate-400">
-                Bill to / contact
-              </label>
-              <input
-                className="w-full rounded-md border border-slate-700 bg-slate-950 text-slate-200 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
-                value={newInvoice.contact}
-                onChange={(e) =>
-                  handleFormChange("contact", e.target.value)
-                }
-                required
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-xs font-medium text-slate-400">
-                Hours
-              </label>
-              <input
-                type="number"
-                min="0"
-                step="0.1"
-                className="w-full rounded-md border border-slate-700 bg-slate-950 text-slate-200 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
-                value={newInvoice.hours}
-                onChange={(e) =>
-                  handleFormChange("hours", e.target.value)
-                }
-                required
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-xs font-medium text-slate-400">
-                Rate ($/hr)
-              </label>
-              <input
-                type="number"
-                min="0"
-                step="1"
-                className="w-full rounded-md border border-slate-700 bg-slate-950 text-slate-200 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
-                value={newInvoice.rate}
-                onChange={(e) =>
-                  handleFormChange("rate", e.target.value)
-                }
-                required
-              />
-            </div>
-            <div className="md:col-span-3 flex items-end">
-              <button
-                type="submit"
-                className="inline-flex rounded-md bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-500 transition-colors"
-              >
-                Add invoice
-              </button>
-            </div>
-          </form>
-        )}
       </div>
 
       {/* Invoice list */}
@@ -492,46 +284,33 @@ export default function BillingOverview() {
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <select
-                      className="rounded-md border border-slate-700 bg-slate-900 text-slate-200 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
-                      value={inv.status}
-                      onChange={(e) =>
-                        handleStatusChange(
-                          inv.id,
-                          e.target.value as InvoiceStatus
-                        )
-                      }
-                    >
-                      <option value="Draft">Draft</option>
-                      <option value="Sent">Sent</option>
-                      <option value="For county report">
-                        For county report
-                      </option>
-                    </select>
+                    <DemoDisable>
+                      <select
+                        className="rounded-md border border-slate-700 bg-slate-900 text-slate-200 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+                        value={inv.status}
+                      >
+                        <option value="Draft">Draft</option>
+                        <option value="Sent">Sent</option>
+                        <option value="For county report">
+                          For county report
+                        </option>
+                      </select>
+                    </DemoDisable>
                     <button
                       type="button"
                       className="rounded-md border border-slate-700 bg-slate-800 px-3 py-1 text-xs font-medium text-slate-200 hover:bg-slate-700 transition-colors"
-                      onClick={() => {
-                        if (inv.status === "Draft") {
-                          handlePrepareAndSend(inv);
-                        } else {
-                          handleViewInvoice(inv);
-                        }
-                      }}
+                      onClick={() => handleViewInvoice(inv)}
                     >
-                      {inv.status === "Draft" && "Prepare & send"}
-                      {inv.status === "Sent" && "View invoice"}
-                      {inv.status === "For county report" &&
-                        "View for report"}
+                      View invoice
                     </button>
-                    {/* 🗑 Delete button */}
-                    <button
-                      type="button"
-                      className="rounded-md border border-slate-700 bg-transparent px-3 py-1 text-xs font-medium text-red-400 hover:bg-red-900/20 hover:border-red-800 transition-colors"
-                      onClick={() => handleDeleteInvoice(inv.id)}
-                    >
-                      Delete
-                    </button>
+                    <DemoDisable>
+                      <button
+                        type="button"
+                        className="rounded-md border border-slate-700 bg-transparent px-3 py-1 text-xs font-medium text-red-400 hover:bg-red-900/20 hover:border-red-800 transition-colors"
+                      >
+                        Delete
+                      </button>
+                    </DemoDisable>
                   </div>
                 </div>
               );
