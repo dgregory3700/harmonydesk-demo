@@ -1,22 +1,16 @@
 import { DashboardGreeting } from "@/components/dashboard/DashboardGreeting";
 import { SessionsOverview } from "@/components/dashboard/SessionsOverview";
 import { TodayPanel } from "@/components/dashboard/TodayPanel";
+import { demoDashboardStats } from "@/lib/demo/data/dashboard";
 
 export default function DashboardPage() {
-  const stats = [
-    { label: "Upcoming sessions", value: 5 },
-    { label: "New inquiries", value: 3 },
-    { label: "Messages to review", value: 4 },
-    { label: "Booking rate (7d)", value: "62%" },
-  ];
-
   return (
     <div className="space-y-6">
       <DashboardGreeting />
 
       {/* Top stats row */}
       <div className="grid gap-4 md:grid-cols-4">
-        {stats.map((s) => (
+        {demoDashboardStats.map((s) => (
           <div
             key={s.label}
             className="rounded-2xl border border-slate-800 bg-slate-900/50 px-6 py-4 shadow-sm"
