@@ -1,10 +1,9 @@
-// src/app/layout.tsx
-
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 import { DemoBanner } from "@/components/demo/DemoBanner";
+import { DemoFetchGuard } from "@/components/demo/DemoFetchGuard";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,7 +30,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col bg-slate-950 text-slate-200`}
       >
-        {/* Global Demo Banner (shows on every route) */}
+        <DemoFetchGuard />
         <DemoBanner />
 
         <main className="flex-1">{children}</main>
