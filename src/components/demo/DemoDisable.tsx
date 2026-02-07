@@ -24,5 +24,5 @@ export function DemoDisable({
     disabled: true,
     "aria-disabled": true,
     title: message,
-  });
+  } as any);
 }
