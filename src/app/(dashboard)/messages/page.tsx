@@ -3,27 +3,10 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-
-type CaseStatus = "Open" | "Upcoming" | "Closed";
-
-type MediationCase = {
-  id: string;
-  caseNumber: string;
-  matter: string;
-  parties: string;
-  county: string;
-  status: CaseStatus;
-  nextSessionDate: string | null;
-  notes: string | null;
-};
-
-type Message = {
-  id: string;
-  caseId: string | null;
-  subject: string;
-  body: string;
-  createdAt: string;
-};
+import { demoDataClient } from "@/lib/demo/client";
+import { DemoDisable } from "@/components/demo/DemoDisable";
+import type { MediationCase } from "@/lib/demo/data/cases";
+import type { Message } from "@/lib/demo/data/messages";
 
 function formatDate(value?: string | null) {
   if (!value) return "—";
@@ -55,23 +38,13 @@ export default function MessagesPage() {
         setLoading(true);
         setError(null);
 
-        const [messagesRes, casesRes] = await Promise.all([
-          fetch("/api/messages"),
-          fetch("/api/cases"),
+        const [messagesData, casesData] = await Promise.all([
+          demoDataClient.getMessages(),
+          demoDataClient.getCases(),
         ]);
 
-        if (!messagesRes.ok) {
-          throw new Error("Failed to load messages");
-        }
-        if (!casesRes.ok) {
-          throw new Error("Failed to load cases");
-        }
-
-        const messagesJson = (await messagesRes.json()) as Message[];
-        const casesJson = (await casesRes.json()) as MediationCase[];
-
-        setMessages(messagesJson);
-        setCases(casesJson);
+        setMessages(messagesData);
+        setCases(casesData);
       } catch (err: any) {
         console.error("Error loading messages:", err);
         setError(err?.message ?? "Failed to load messages");
@@ -118,12 +91,14 @@ export default function MessagesPage() {
           </p>
         </div>
 
-        <Link
-          href="/messages/new"
-          className="rounded-md bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-500 transition-colors"
-        >
-          + New message
-        </Link>
+        <DemoDisable>
+          <Link
+            href="/messages/new"
+            className="rounded-md bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-500 transition-colors"
+          >
+            + New message
+          </Link>
+        </DemoDisable>
       </div>
 
       {/* Search */}

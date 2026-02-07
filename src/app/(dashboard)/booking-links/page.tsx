@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { DemoDisable } from "@/components/demo/DemoDisable";
 
 type BookingLink = {
   id: string;
@@ -112,12 +113,14 @@ export default function BookingLinksPage() {
                 >
                   {copiedId === link.id ? "Copied" : "Copy link"}
                 </button>
-                <button
-                  type="button"
-                  className="inline-flex rounded-md border border-slate-700 bg-transparent px-3 py-2 text-xs font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition-colors"
-                >
-                  Preview (coming soon)
-                </button>
+                <DemoDisable>
+                  <button
+                    type="button"
+                    className="inline-flex rounded-md border border-slate-700 bg-transparent px-3 py-2 text-xs font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition-colors"
+                  >
+                    Preview (coming soon)
+                  </button>
+                </DemoDisable>
               </div>
             </div>
           ))}

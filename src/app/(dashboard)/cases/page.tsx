@@ -2,19 +2,11 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { demoDataClient } from "@/lib/demo/client";
+import { DemoDisable } from "@/components/demo/DemoDisable";
+import type { MediationCase } from "@/lib/demo/data/cases";
 
 type CaseStatus = "Open" | "Upcoming" | "Closed";
-
-type MediationCase = {
-  id: string;
-  caseNumber: string;
-  matter: string;
-  parties: string;
-  county: string;
-  status: CaseStatus;
-  nextSessionDate: string | null;
-  notes: string | null;
-};
 
 export default function CasesPage() {
   const [cases, setCases] = useState<MediationCase[]>([]);
@@ -29,12 +21,7 @@ export default function CasesPage() {
         setLoading(true);
         setError(null);
 
-        const res = await fetch("/api/cases");
-        if (!res.ok) {
-          throw new Error("Failed to load cases");
-        }
-
-        const data = (await res.json()) as MediationCase[];
+        const data = await demoDataClient.getCases();
         setCases(data);
       } catch (err: any) {
         console.error("Error loading cases:", err);
@@ -99,12 +86,14 @@ export default function CasesPage() {
           </p>
         </div>
 
-        <Link
-          href="/cases/new"
-          className="rounded-md bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-500 transition-colors"
-        >
-          + New case
-        </Link>
+        <DemoDisable>
+          <Link
+            href="/cases/new"
+            className="rounded-md bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-500 transition-colors"
+          >
+            + New case
+          </Link>
+        </DemoDisable>
       </div>
 
       {/* Overview stats */}
@@ -237,17 +226,14 @@ export default function CasesPage() {
                     >
                       View case file
                     </Link>
-                    <button
-                      type="button"
-                      className="rounded-md border border-slate-700 bg-transparent px-3 py-1 text-xs font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition-colors"
-                      onClick={() =>
-                        alert(
-                          "In production this will create an invoice from this case."
-                        )
-                      }
-                    >
-                      Create invoice
-                    </button>
+                    <DemoDisable>
+                      <button
+                        type="button"
+                        className="rounded-md border border-slate-700 bg-transparent px-3 py-1 text-xs font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition-colors"
+                      >
+                        Create invoice
+                      </button>
+                    </DemoDisable>
                   </div>
                 </div>
               </div>
