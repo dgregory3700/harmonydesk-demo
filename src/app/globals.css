@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+/* Global light theme only */
+:root {
+  /* Tell the browser to treat this as a light UI (affects form controls, etc.) */
+  color-scheme: light;
+
+  /* Base colors */
+  --background: #f3f4f6;   /* light gray app background */
+  --foreground: #020617;   /* near-black text */
+
+  /* You can tweak these, but keep them light + high contrast */
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+/* IMPORTANT: no prefers-color-scheme: dark override anymore */
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), system-ui, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
