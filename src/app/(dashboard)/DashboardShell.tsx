@@ -14,9 +14,11 @@ import {
   Settings,
 } from "lucide-react";
 
+const STRIPE_CHECKOUT_URL = process.env.NEXT_PUBLIC_STRIPE_CHECKOUT_URL ?? "";
+
 type Props = {
   children: ReactNode;
-  userEmail: string;
+  userEmail: string; // kept for compatibility with existing layout; ignored in demo UI
 };
 
 const navItems = [
@@ -36,7 +38,7 @@ const baseLink =
 const activeLink = "bg-sky-500/10 text-sky-400";
 const inactiveLink = "text-slate-400 hover:bg-slate-800 hover:text-slate-200";
 
-export default function DashboardShell({ children, userEmail }: Props) {
+export default function DashboardShell({ children }: Props) {
   const pathname = usePathname();
 
   return (
@@ -57,7 +59,9 @@ export default function DashboardShell({ children, userEmail }: Props) {
                 pathname === item.href ||
                 (item.href !== "/dashboard" && pathname.startsWith(item.href));
 
-              const className = `${baseLink} ${isActive ? activeLink : inactiveLink}`;
+              const className = `${baseLink} ${
+                isActive ? activeLink : inactiveLink
+              }`;
 
               return (
                 <Link key={item.href} href={item.href} className={className}>
@@ -75,10 +79,37 @@ export default function DashboardShell({ children, userEmail }: Props) {
 
         <main className="flex-1">
           <header className="flex items-center justify-between border-b border-slate-800 bg-slate-950 px-4 py-3 md:px-6">
-            <h1 className="text-sm font-medium text-slate-400">
-              HarmonyDesk dashboard
-            </h1>
-            <span className="text-xs text-slate-500">Logged in as {userEmail}</span>
+            <div className="flex flex-col">
+              <h1 className="text-sm font-medium text-slate-400">
+                HarmonyDesk dashboard
+              </h1>
+              <span className="text-xs text-slate-500">
+                Demo mode — Sample data (read-only)
+              </span>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <Link
+                href={STRIPE_CHECKOUT_URL || "#"}
+                className={[
+                  "rounded-md px-3 py-1.5 text-sm font-semibold",
+                  STRIPE_CHECKOUT_URL
+                    ? "bg-sky-500 text-slate-950 hover:opacity-90"
+                    : "bg-slate-800 text-slate-400 opacity-60 cursor-not-allowed",
+                ].join(" ")}
+                aria-disabled={!STRIPE_CHECKOUT_URL}
+                onClick={(e) => {
+                  if (!STRIPE_CHECKOUT_URL) e.preventDefault();
+                }}
+                title={
+                  STRIPE_CHECKOUT_URL
+                    ? "Start HarmonyDesk"
+                    : "Set NEXT_PUBLIC_STRIPE_CHECKOUT_URL in Vercel"
+                }
+              >
+                Start HarmonyDesk
+              </Link>
+            </div>
           </header>
 
           <div className="px-4 py-6 md:px-6">{children}</div>
