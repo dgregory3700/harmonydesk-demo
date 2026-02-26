@@ -1,6 +1,10 @@
 // src/lib/demo/data/cases.ts
 
-export type CaseStatus = "Open" | "Upcoming" | "Closed";
+// Production truth (mirrored in demo):
+// - Cases are containers with status Active/Closed only.
+// - “Upcoming” is session-level only (not a case status).
+
+export type CaseStatus = "Active" | "Closed";
 
 export type MediationCase = {
   id: string;
@@ -9,7 +13,7 @@ export type MediationCase = {
   parties: string;
   county: string;
   status: CaseStatus;
-  nextSessionDate: string | null;
+  nextSessionDate: string | null; // kept for display parity only
   notes: string | null;
 };
 
@@ -20,9 +24,10 @@ export const demoCases: MediationCase[] = [
     matter: "Smith vs. Jones Property Dispute",
     parties: "Sarah Smith, Michael Jones",
     county: "King County",
-    status: "Open",
+    status: "Active",
     nextSessionDate: "2026-02-15T14:00:00Z",
-    notes: "Initial session completed. Parties willing to negotiate boundary fence placement.",
+    notes:
+      "Initial session completed. Parties willing to negotiate boundary fence placement.",
   },
   {
     id: "case-002",
@@ -30,9 +35,10 @@ export const demoCases: MediationCase[] = [
     matter: "Anderson Family Estate Division",
     parties: "Emily Anderson, Robert Anderson, Lisa Anderson-Chen",
     county: "Pierce County",
-    status: "Upcoming",
+    status: "Active",
     nextSessionDate: "2026-02-12T10:00:00Z",
-    notes: "Family mediation regarding inheritance distribution. All parties are cooperative.",
+    notes:
+      "Family mediation regarding inheritance distribution. All parties are cooperative.",
   },
   {
     id: "case-003",
@@ -42,7 +48,8 @@ export const demoCases: MediationCase[] = [
     county: "King County",
     status: "Closed",
     nextSessionDate: null,
-    notes: "Successfully mediated business partnership dissolution. Agreement signed and filed.",
+    notes:
+      "Successfully mediated business partnership dissolution. Agreement signed and filed.",
   },
   {
     id: "case-004",
@@ -50,9 +57,10 @@ export const demoCases: MediationCase[] = [
     matter: "Martinez Landlord-Tenant Dispute",
     parties: "Carlos Martinez (Landlord), Jennifer Thompson (Tenant)",
     county: "Snohomish County",
-    status: "Open",
+    status: "Active",
     nextSessionDate: "2026-02-20T15:30:00Z",
-    notes: "Dispute over security deposit and property damage. Second session scheduled.",
+    notes:
+      "Dispute over security deposit and property damage. Second session scheduled.",
   },
   {
     id: "case-005",
@@ -62,6 +70,7 @@ export const demoCases: MediationCase[] = [
     county: "King County",
     status: "Closed",
     nextSessionDate: null,
-    notes: "Settled after 3 sessions. Payment plan agreed upon for outstanding work.",
+    notes:
+      "Settled after 3 sessions. Payment plan agreed upon for outstanding work.",
   },
 ];
