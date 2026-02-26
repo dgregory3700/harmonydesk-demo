@@ -2,7 +2,10 @@ import Link from "next/link";
 import { DashboardGreeting } from "@/components/dashboard/DashboardGreeting";
 import { SessionsOverview } from "@/components/dashboard/SessionsOverview";
 import { TodayPanel } from "@/components/dashboard/TodayPanel";
-import { demoDashboardStats } from "@/lib/demo/data/dashboard";
+import {
+  demoDashboardStats,
+  demoUpcomingSessions,
+} from "@/lib/demo/data/dashboard";
 
 function pickStat(label: string): number {
   const found = demoDashboardStats.find((s) => s.label === label);
@@ -12,7 +15,7 @@ function pickStat(label: string): number {
 }
 
 export default function DashboardPage() {
-  // Mirror production labels + destinations.
+  // Production-parity labels + destinations.
   // Values are sourced from demoDashboardStats (fail-soft to 0).
   const stats: Array<{
     label: string;
@@ -74,16 +77,17 @@ export default function DashboardPage() {
 
       {/* Same layout as production */}
       <div className="grid gap-4 lg:grid-cols-[2fr,1fr]">
-        <SessionsOverview />
+        <SessionsOverview sessions={demoUpcomingSessions} />
         <TodayPanel />
       </div>
 
-      {/* Demo truth footer (optional but recommended for sales honesty) */}
+      {/* Demo truth footer */}
       <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-4 text-xs text-slate-500 shadow-sm">
         <p className="font-medium mb-1 text-slate-400">Demo mode</p>
         <p>
-          Sample data (read-only). Stats and lists are illustrative. In production,
-          Cases are containers (Active/Closed) and “Upcoming” is session-level only.
+          Sample data (read-only). Stats and lists are illustrative. In
+          production, Cases are containers (Active/Closed) and “Upcoming” is
+          session-level only.
         </p>
       </div>
     </div>
