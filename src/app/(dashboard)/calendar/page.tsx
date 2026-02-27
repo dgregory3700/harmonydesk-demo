@@ -34,22 +34,6 @@ function formatDateOnly(value?: string | null) {
   });
 }
 
-/**
- * Date-only comparison helpers:
- * Treat anything on "today" as upcoming (if not completed),
- * even if the time-of-day is earlier than the current moment.
- * This avoids demo timezone/time parsing surprises.
- */
-function startOfDayLocal(d: Date) {
-  return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0, 0, 0);
-}
-
-function isTodayOrFuture(iso: string, now: Date) {
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) return false;
-  return startOfDayLocal(date).getTime() >= startOfDayLocal(now).getTime();
-}
-
 export default function CalendarPage() {
   const router = useRouter();
 
@@ -108,12 +92,11 @@ export default function CalendarPage() {
   }, [sessions, caseById]);
 
   const filteredSessions = useMemo(() => {
-    const now = new Date();
-
     return enrichedSessions.filter((s) => {
       if (filter === "Upcoming") {
-        // Upcoming = not completed AND today-or-future (date-only)
-        return !s.completed && isTodayOrFuture(s.date, now);
+        // Demo semantics: "Upcoming" means "not completed"
+        // (we do NOT enforce future-date filtering in demo data).
+        return !s.completed;
       }
       if (filter === "Completed") {
         return s.completed;
@@ -135,7 +118,7 @@ export default function CalendarPage() {
             Calendar
           </h1>
           <p className="text-sm text-slate-400">
-            See upcoming and past mediation sessions.
+            Demo mode — sample sessions (read-only).
           </p>
         </div>
 
@@ -183,8 +166,7 @@ export default function CalendarPage() {
           <p className="text-sm text-red-400">{error}</p>
         ) : filteredSessions.length === 0 ? (
           <p className="text-sm text-slate-500">
-            No sessions match this view. Add a session from a case, and it will
-            appear here.
+            No sessions match this view.
           </p>
         ) : (
           <div className="space-y-3">
