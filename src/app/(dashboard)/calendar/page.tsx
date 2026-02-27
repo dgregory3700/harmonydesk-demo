@@ -11,9 +11,7 @@ import type { MediationSession } from "@/lib/demo/data/sessions";
 function formatDateTime(value?: string | null) {
   if (!value) return "—";
   const d = new Date(value);
-  if (Number.isNaN(d.getTime())) {
-    return value;
-  }
+  if (Number.isNaN(d.getTime())) return value;
   return d.toLocaleString("en-US", {
     weekday: "short",
     month: "short",
@@ -27,15 +25,29 @@ function formatDateTime(value?: string | null) {
 function formatDateOnly(value?: string | null) {
   if (!value) return "—";
   const d = new Date(value);
-  if (Number.isNaN(d.getTime())) {
-    return value;
-  }
+  if (Number.isNaN(d.getTime())) return value;
   return d.toLocaleDateString("en-US", {
     weekday: "short",
     month: "short",
     day: "numeric",
     year: "numeric",
   });
+}
+
+/**
+ * Date-only comparison helpers:
+ * Treat anything on "today" as upcoming (if not completed),
+ * even if the time-of-day is earlier than the current moment.
+ * This avoids demo timezone/time parsing surprises.
+ */
+function startOfDayLocal(d: Date) {
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0, 0, 0);
+}
+
+function isTodayOrFuture(iso: string, now: Date) {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return false;
+  return startOfDayLocal(date).getTime() >= startOfDayLocal(now).getTime();
 }
 
 export default function CalendarPage() {
@@ -77,13 +89,9 @@ export default function CalendarPage() {
 
   const caseById = useMemo(() => {
     const map = new Map<string, MediationCase>();
-    for (const c of cases) {
-      map.set(c.id, c);
-    }
+    for (const c of cases) map.set(c.id, c);
     return map;
   }, [cases]);
-
-  const now = new Date();
 
   // --- SORTING & FILTERING ---
   const enrichedSessions = useMemo(() => {
@@ -100,19 +108,19 @@ export default function CalendarPage() {
   }, [sessions, caseById]);
 
   const filteredSessions = useMemo(() => {
-    return enrichedSessions.filter((s) => {
-      const d = new Date(s.date);
-      const isFuture = d >= now;
+    const now = new Date();
 
+    return enrichedSessions.filter((s) => {
       if (filter === "Upcoming") {
-        return !s.completed && isFuture;
+        // Upcoming = not completed AND today-or-future (date-only)
+        return !s.completed && isTodayOrFuture(s.date, now);
       }
       if (filter === "Completed") {
         return s.completed;
       }
       return true;
     });
-  }, [enrichedSessions, filter, now]);
+  }, [enrichedSessions, filter]);
 
   function handleRowClick(id: string) {
     router.push(`/calendar/${id}`);
@@ -181,7 +189,8 @@ export default function CalendarPage() {
         ) : (
           <div className="space-y-3">
             {filteredSessions.map((s) => {
-              const caseInfo = s.caseInfo;
+              const caseInfo = (s as any).caseInfo as MediationCase | undefined;
+
               return (
                 <button
                   key={s.id}
@@ -204,9 +213,7 @@ export default function CalendarPage() {
                       </p>
                     )}
                     {s.notes && (
-                      <p className="text-slate-500 line-clamp-2">
-                        {s.notes}
-                      </p>
+                      <p className="text-slate-500 line-clamp-2">{s.notes}</p>
                     )}
                   </div>
 
