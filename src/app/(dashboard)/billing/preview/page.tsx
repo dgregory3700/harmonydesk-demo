@@ -48,7 +48,8 @@ export default function BillingPreviewPage({
           </h1>
           <p className="text-sm text-slate-400">{subtitle}</p>
           <p className="mt-2 text-sm text-slate-400">
-            This is a <span className="font-medium text-slate-200">sample preview</span>{" "}
+            This is a{" "}
+            <span className="font-medium text-slate-200">sample preview</span>{" "}
             shown in the demo. Your paid dashboard generates real reports from your
             case and invoice data.
           </p>
@@ -68,26 +69,22 @@ export default function BillingPreviewPage({
             Sample report output (demo)
           </h2>
 
-          <Link
-            href={STRIPE_CHECKOUT_URL || "#"}
-            className={[
-              "rounded-md px-3 py-1.5 text-sm font-semibold",
-              STRIPE_CHECKOUT_URL
-                ? "bg-sky-500 text-slate-950 hover:opacity-90"
-                : "bg-slate-800 text-slate-400 opacity-60 cursor-not-allowed",
-            ].join(" ")}
-            aria-disabled={!STRIPE_CHECKOUT_URL}
-            onClick={(e) => {
-              if (!STRIPE_CHECKOUT_URL) e.preventDefault();
-            }}
-            title={
-              STRIPE_CHECKOUT_URL
-                ? "Start HarmonyDesk"
-                : "Set NEXT_PUBLIC_STRIPE_CHECKOUT_URL in Vercel"
-            }
-          >
-            Start HarmonyDesk
-          </Link>
+          {STRIPE_CHECKOUT_URL ? (
+            <Link
+              href={STRIPE_CHECKOUT_URL}
+              className="rounded-md px-3 py-1.5 text-sm font-semibold bg-sky-500 text-slate-950 hover:opacity-90"
+              title="Start HarmonyDesk"
+            >
+              Start HarmonyDesk
+            </Link>
+          ) : (
+            <span
+              className="rounded-md px-3 py-1.5 text-sm font-semibold bg-slate-800 text-slate-400 opacity-60 cursor-not-allowed"
+              title="Set NEXT_PUBLIC_STRIPE_CHECKOUT_URL in Vercel"
+            >
+              Start HarmonyDesk
+            </span>
+          )}
         </div>
 
         <div className="mt-4 overflow-x-auto">
