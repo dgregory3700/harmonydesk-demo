@@ -86,8 +86,11 @@ export default function MessagesPage() {
             Messages
           </h1>
           <p className="text-sm text-slate-400">
-            Log internal case notes and send outbound email to clients. Replies are not captured in HarmonyDesk.
-          </p>
+  Log internal case notes and send outbound email to clients.{" "}
+  <span className="text-amber-300 font-medium">
+    Replies are not captured in HarmonyDesk.
+  </span>
+</p>
         </div>
 
         <Link
