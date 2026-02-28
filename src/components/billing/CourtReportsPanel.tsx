@@ -1,5 +1,7 @@
 // src/components/billing/CourtReportsPanel.tsx
 
+import Link from "next/link";
+
 const counties = [
   {
     id: "king-wa",
@@ -40,13 +42,19 @@ export function CourtReportsPanel() {
           >
             <p className="font-medium text-slate-200">{c.name}</p>
             <p className="text-[11px] text-slate-500">{c.format}</p>
+
             <div className="mt-1 flex items-center justify-between">
               <span className="text-[11px] text-slate-500">
                 Next report: {c.nextDue}
               </span>
-              <button className="text-[11px] rounded-full border border-slate-700 px-2 py-0.5 text-sky-400 hover:bg-slate-900 hover:text-sky-300 transition-colors">
+
+              <Link
+                href={`/billing/preview?county=${encodeURIComponent(c.id)}`}
+                className="text-[11px] rounded-full border border-slate-700 px-2 py-0.5 text-sky-400 hover:bg-slate-900 hover:text-sky-300 transition-colors"
+                title="View a sample preview (demo)"
+              >
                 Preview
-              </button>
+              </Link>
             </div>
           </div>
         ))}
