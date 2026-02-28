@@ -1,4 +1,3 @@
-//src/app/(dashboard)/DashboardShell.tsx
 "use client";
 
 import type { ReactNode } from "react";
@@ -36,7 +35,8 @@ const navItems = [
 const baseLink =
   "flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors";
 const activeLink = "bg-sky-500/10 text-sky-400";
-const inactiveLink = "text-slate-400 hover:bg-slate-800 hover:text-slate-200";
+const inactiveLink =
+  "text-slate-400 hover:bg-slate-800 hover:text-slate-200";
 
 export default function DashboardShell({ children }: Props) {
   const pathname = usePathname();
@@ -57,7 +57,8 @@ export default function DashboardShell({ children }: Props) {
 
               const isActive =
                 pathname === item.href ||
-                (item.href !== "/dashboard" && pathname.startsWith(item.href));
+                (item.href !== "/dashboard" &&
+                  pathname.startsWith(item.href));
 
               const className = `${baseLink} ${
                 isActive ? activeLink : inactiveLink
@@ -83,8 +84,13 @@ export default function DashboardShell({ children }: Props) {
               <h1 className="text-sm font-medium text-slate-400">
                 HarmonyDesk dashboard
               </h1>
+
+              {/* Demo Banner */}
               <span className="text-xs text-slate-500">
-                Demo mode — Sample data (read-only)
+                Demo mode — sample data (read-only)
+              </span>
+              <span className="mt-0.5 text-sm font-semibold text-amber-300">
+                Demo v0.2 — your paid dashboard may be newer.
               </span>
             </div>
 
