@@ -90,7 +90,7 @@ export default function DashboardShell({ children }: Props) {
                 Demo mode — sample data (read-only)
               </span>
               <span className="mt-0.5 text-sm font-semibold text-amber-300">
-                Demo v0.2 — your paid dashboard may be newer.
+                Demo v1.3 — your paid dashboard may be newer.
               </span>
             </div>
 
