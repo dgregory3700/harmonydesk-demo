@@ -87,14 +87,12 @@ export default function CasesPage() {
           </p>
         </div>
 
-        <DemoDisable>
-          <Link
-            href="/cases/new"
-            className="rounded-md bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-500 transition-colors"
-          >
-            + New case
-          </Link>
-        </DemoDisable>
+        <Link
+  href="/cases/new"
+  className="rounded-md bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-500 transition-colors"
+>
+  + New case
+</Link>
       </div>
 
       {/* Overview stats */}
