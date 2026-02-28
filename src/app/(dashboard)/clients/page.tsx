@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { demoDataClient } from "@/lib/demo/client";
-import { DemoDisable } from "@/components/demo/DemoDisable";
 import type { Client } from "@/lib/demo/data/clients";
 
 export default function ClientsPage() {
@@ -59,14 +58,12 @@ export default function ClientsPage() {
           </p>
         </div>
 
-        <DemoDisable>
-          <Link
-            href="/clients/new"
-            className="rounded-md bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-500 transition-colors"
-          >
-            + New client
-          </Link>
-        </DemoDisable>
+        <Link
+          href="/clients/new"
+          className="rounded-md bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-500 transition-colors"
+        >
+          + New client
+        </Link>
       </div>
 
       {/* Filters + search */}
@@ -124,14 +121,6 @@ export default function ClientsPage() {
                   >
                     View client
                   </Link>
-                  <DemoDisable>
-                    <Link
-                      href={`/cases/new`}
-                      className="rounded-md border border-slate-700 bg-transparent px-3 py-1 font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition-colors"
-                    >
-                      Add case
-                    </Link>
-                  </DemoDisable>
                 </div>
               </div>
             ))}
