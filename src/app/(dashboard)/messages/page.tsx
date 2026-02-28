@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { demoDataClient } from "@/lib/demo/client";
-import { DemoDisable } from "@/components/demo/DemoDisable";
 import type { MediationCase } from "@/lib/demo/data/cases";
 import type { Message } from "@/lib/demo/data/messages";
 
@@ -87,25 +86,22 @@ export default function MessagesPage() {
             Messages
           </h1>
           <p className="text-sm text-slate-400">
-            Keep internal notes or message history linked to your cases.
+            Log internal case notes and send outbound email to clients. Replies are not captured in HarmonyDesk.
           </p>
         </div>
 
-        <DemoDisable>
-          <Link
-            href="/messages/new"
-            className="rounded-md bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-500 transition-colors"
-          >
-            + New message
-          </Link>
-        </DemoDisable>
+        <Link
+          href="/messages/new"
+          className="rounded-md bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-500 transition-colors"
+        >
+          + New message
+        </Link>
       </div>
 
       {/* Search */}
       <div className="flex flex-col gap-3 rounded-xl border border-slate-800 bg-slate-900/50 p-4 shadow-sm md:flex-row md:items-center md:justify-between">
         <p className="text-xs text-slate-400">
-          Messages are internal-only for now. Later we can connect email or SMS
-          providers.
+          All messages are linked to cases and stored in your dashboard.
         </p>
         <div className="w-full md:w-64">
           <input
@@ -120,7 +116,9 @@ export default function MessagesPage() {
 
       {/* List */}
       <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-4 shadow-sm">
-        <h2 className="mb-3 text-sm font-medium text-slate-300">Inbox</h2>
+        <h2 className="mb-3 text-sm font-medium text-slate-300">
+          Message log
+        </h2>
 
         {loading ? (
           <p className="text-sm text-slate-500">Loading…</p>
@@ -128,8 +126,7 @@ export default function MessagesPage() {
           <p className="text-sm text-red-400">{error}</p>
         ) : filtered.length === 0 ? (
           <p className="text-sm text-slate-500">
-            No messages yet. Start by creating a new message and linking it to a
-            case.
+            No messages yet. Start by creating a new message and linking it to a case.
           </p>
         ) : (
           <div className="space-y-3">
