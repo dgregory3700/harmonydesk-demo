@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import "./globals.css";
 
 import { DemoBanner } from "@/components/demo/DemoBanner";
@@ -16,9 +17,21 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
+      <head>
+        <Script id="rewardful-init" strategy="afterInteractive">
+          {`(function(w,r){w._rwq=r;w[r]=w[r]||function(){(w[r].q=w[r].q||[]).push(arguments)}})(window,'rewardful');`}
+        </Script>
+        <Script
+          async
+          src="https://r.wdfl.co/rw.js"
+          data-rewardful="d91f66"
+          strategy="afterInteractive"
+        />
+      </head>
+
       <body
         className="antialiased min-h-screen flex flex-col bg-slate-950 text-slate-200"
-        style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
+        style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
       >
         <DemoFetchGuard />
         <DemoBanner />
