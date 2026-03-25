@@ -247,15 +247,17 @@ function NewMessagePageInner() {
 
             {/* Email options */}
             <div className="space-y-2 border-t border-slate-800 pt-3 mt-2">
-              <label className="flex items-center gap-2 text-xs text-slate-400 hover:text-slate-200 cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="h-3 w-3 accent-sky-500"
-                  checked={sendAsEmail}
-                  onChange={(e) => setSendAsEmail(e.target.checked)}
-                />
-                <span>Also send this as an email</span>
-              </label>
+             <label className="flex items-center space-x-3 mt-4 cursor-pointer">
+  <input
+    type="checkbox"
+    className="h-6 w-6 rounded border-orange-500 text-orange-600 focus:ring-orange-500"
+    checked={sendAsEmail}
+    onChange={(e) => setSendAsEmail(e.target.checked)}
+  />
+  <span className="text-xl font-bold text-orange-600">
+    Also send this as an email
+  </span>
+</label>
 
               {sendAsEmail && (
                 <div className="space-y-1">
