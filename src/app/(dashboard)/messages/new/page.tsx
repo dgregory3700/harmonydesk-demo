@@ -254,7 +254,7 @@ function NewMessagePageInner() {
     checked={sendAsEmail}
     onChange={(e) => setSendAsEmail(e.target.checked)}
   />
-  <span className="text-xl font-bold text-orange-600">
+  <span className="text-xl font-bold text-slate-600">
     Also send this as an email
   </span>
 </label>
