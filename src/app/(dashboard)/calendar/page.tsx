@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { demoDataClient } from "@/lib/demo/client";
+import { DemoDisable } from "@/components/demo/DemoDisable";
 import type { MediationCase } from "@/lib/demo/data/cases";
 import type { MediationSession } from "@/lib/demo/data/sessions";
 
@@ -115,19 +115,21 @@ export default function CalendarPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-slate-100">
-            Calendar
+            Sessions
           </h1>
           <p className="text-sm text-slate-400">
             Demo mode — sample sessions (read-only).
           </p>
         </div>
 
-        <Link
-          href="/cases"
-          className="rounded-md border border-slate-700 bg-slate-800 px-4 py-2 text-sm font-medium text-slate-200 hover:bg-slate-700 transition-colors"
-        >
-          Add session from a case
-        </Link>
+        <DemoDisable message="Demo mode — scheduling is available in your live workspace.">
+          <button
+            type="button"
+            className="rounded-md border border-slate-700 bg-slate-800 px-4 py-2 text-sm font-medium text-slate-200 hover:bg-slate-700 transition-colors"
+          >
+            New session
+          </button>
+        </DemoDisable>
       </div>
 
       {/* Filters */}
@@ -161,7 +163,7 @@ export default function CalendarPage() {
         <h2 className="mb-3 text-sm font-medium text-slate-300">Sessions</h2>
 
         {loading ? (
-          <p className="text-sm text-slate-500">Loading calendar…</p>
+          <p className="text-sm text-slate-500">Loading sessions…</p>
         ) : error ? (
           <p className="text-sm text-red-400">{error}</p>
         ) : filteredSessions.length === 0 ? (
