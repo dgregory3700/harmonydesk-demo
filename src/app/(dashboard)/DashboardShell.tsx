@@ -6,27 +6,41 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Calendar,
-  FolderKanban,
+  Inbox,
   FileText,
+  ScrollText,
   MessageCircle,
   Users,
   Settings,
 } from "lucide-react";
+import { demoSessionRequests } from "@/lib/demo/data/requests";
 
 const STRIPE_CHECKOUT_URL = process.env.NEXT_PUBLIC_STRIPE_CHECKOUT_URL ?? "";
+
+// Static, seed-derived count for the Session Requests badge. The live app
+// polls a cookie-bound /api/requests/count endpoint; the demo has no backend,
+// so the badge simply reflects the number of seeded inbound requests.
+const REQUEST_COUNT = demoSessionRequests.length;
 
 type Props = {
   children: ReactNode;
   userEmail: string; // kept for compatibility with existing layout; ignored in demo UI
 };
 
+// Nav mirrors the live SURFACED set (harmonydesk-pro-dashboard @ ad0eea2):
+// Overview, Sessions (/calendar = canonical sessions list), Session Requests,
+// Billing & Courts, Documents, Messages, Clients, Settings.
+// Cases / Intake / booking-links are HIDDEN exactly as in the live app —
+// attorney-coded / dead Cal.com surfaces.
 const navItems = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
-  { href: "/calendar", label: "Calendar", icon: Calendar },
-  { href: "/cases", label: "Cases", icon: FolderKanban },
+  { href: "/calendar", label: "Sessions", icon: Calendar },
+  { href: "/sessions/requests", label: "Session Requests", icon: Inbox },
+  // { href: "/cases", label: "Cases" } — hidden (attorney-coded surface).
   { href: "/billing", label: "Billing & Courts", icon: FileText },
+  { href: "/documents", label: "Documents", icon: ScrollText },
   { href: "/messages", label: "Messages", icon: MessageCircle },
-  // Booking links intentionally hidden in demo until an actual booking flow exists.
+  // Booking links intentionally hidden — Cal.com concept, removed in live app.
   { href: "/clients", label: "Clients", icon: Users },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
@@ -64,10 +78,23 @@ export default function DashboardShell({ children }: Props) {
                 isActive ? activeLink : inactiveLink
               }`;
 
+              const showBadge =
+                item.href === "/sessions/requests" && REQUEST_COUNT > 0;
+
               return (
                 <Link key={item.href} href={item.href} className={className}>
                   <Icon className="h-4 w-4" />
                   <span>{item.label}</span>
+                  {showBadge && (
+                    <span
+                      aria-label={`${REQUEST_COUNT} pending request${
+                        REQUEST_COUNT === 1 ? "" : "s"
+                      }`}
+                      className="ml-auto rounded-full bg-sky-500/20 px-2 py-0.5 text-[10px] font-semibold text-sky-300"
+                    >
+                      {REQUEST_COUNT}
+                    </span>
+                  )}
                 </Link>
               );
             })}
@@ -90,7 +117,7 @@ export default function DashboardShell({ children }: Props) {
                 Demo mode — sample data (read-only)
               </span>
               <span className="mt-0.5 text-sm font-semibold text-amber-300">
-                Demo v1.3 — your paid dashboard may be newer.
+                Demo v1.4 — your paid dashboard may be newer.
               </span>
             </div>
 
