@@ -8,6 +8,11 @@ import { demoMessages, type Message } from "./data/messages";
 import { demoSessions, type MediationSession } from "./data/sessions";
 import { demoInvoices, type Invoice } from "./data/invoices";
 import { demoUserSettings, type UserSettings } from "./data/settings";
+import { demoSessionRequests, type DemoSessionRequest } from "./data/requests";
+import {
+  demoDocumentTemplates,
+  type DemoDocumentTemplate,
+} from "./data/documents";
 
 // Simulate network delay for realistic UX
 const delay = (ms: number = 100) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -55,6 +60,25 @@ export const demoDataClient = {
   async getSessionById(id: string): Promise<MediationSession | null> {
     await delay();
     return demoSessions.find((s) => s.id === id) ?? null;
+  },
+
+  // Session Requests (inbox)
+  async getSessionRequests(): Promise<DemoSessionRequest[]> {
+    await delay();
+    return [...demoSessionRequests];
+  },
+
+  // Court Document templates
+  async getDocumentTemplates(): Promise<DemoDocumentTemplate[]> {
+    await delay();
+    return [...demoDocumentTemplates];
+  },
+
+  async getDocumentTemplateById(
+    id: string
+  ): Promise<DemoDocumentTemplate | null> {
+    await delay();
+    return demoDocumentTemplates.find((t) => t.id === id) ?? null;
   },
 
   // Invoices
