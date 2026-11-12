@@ -142,7 +142,7 @@ function NewMessagePageInner() {
             const emailJson = await emailRes.json().catch(() => ({}));
             setEmailInfo(
               `Email sent via ${emailJson.provider || "sendgrid"} from ${
-                emailJson.from || "contact@harmonydesk.ai"
+                emailJson.from || "duel@dueltech.io"
               }.`
             );
           } else {
@@ -274,7 +274,7 @@ function NewMessagePageInner() {
                   <p className="text-[11px] text-slate-500">
                     For now, emails are sent from{" "}
                     <span className="font-medium text-slate-400">
-                      contact@harmonydesk.ai
+                      duel@dueltech.io
                     </span>
                     .
                   </p>
